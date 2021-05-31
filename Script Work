@@ -1,0 +1,61 @@
+
+If Not ActiveRequest.Fields("Action date").IsNull AND Not ActiveRequest.Fields("Menhour_hour").IsNull AND ActiveRequest.Fields("Overtime").TValue Then
+    Set objCal=ActiveSession.GetRequestByUniqueId(1025452)
+    Set objCal = ActiveSession.GetCalendar(objCal)
+    If ActiveRequest.Fields("Menhour_hour").Tvalue>=0 then
+      If NOT objCal.IsWorkingTime(ActiveRequest.Fields("Action date").TValue, True) Then'Выходной/Праздник
+        ActiveRequest.Fields("OverHoursRate").Tvalue=ActiveRequest.Fields("Menhour_hour").Tvalue*2
+ ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: выходной/праздник, "+CSTR(ActiveRequest.Fields("Menhour_hour").Tvalue)+"ч*2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+      Else
+        Select Case ActiveRequest.Fields("Menhour_hour").Tvalue
+        Case 1 'Разбор по длительности
+            If ActiveRequest.Fields("StartTime").Tvalue.Alias="6-19" OR ActiveRequest.Fields("StartTime").Tvalue.Alias="20" OR ActiveRequest.Fields("StartTime").Tvalue.Alias="21" then 
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=1*1.5            
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 6-21; 1ч*1.5="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            Else
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=1*1.8            
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 22-5; ч*1.5*1.2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            End if
+        Case 2
+            If ActiveRequest.Fields("StartTime").Tvalue.Alias="6-19" OR ActiveRequest.Fields("StartTime").Tvalue.Alias="20" then 
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=2*1.5            
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 6-20; 2ч*1.5="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            Elseif ActiveRequest.Fields("StartTime").Tvalue.Alias="21" OR ActiveRequest.Fields("StartTime").Tvalue.Alias="5" then
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=1*1.5+1*1.8            
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 21,5; 1ч*1.5+1ч*1.5*1.2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            Else
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=2*1.5*1.2            
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 22-4; 2ч*1.5*1.2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            End if
+        Case 3
+            If ActiveRequest.Fields("StartTime").Tvalue.Alias="6-19" then            
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=2*1.5+1*2           
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 6-19; 2ч*1.5+1ч*2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            Elseif ActiveRequest.Fields("StartTime").Tvalue.Alias="20" then
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=2*1.5+1*2*1.2           
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 20; 2ч*1.5+1ч*2*1.2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            Elseif ActiveRequest.Fields("StartTime").Tvalue.Alias="21" then
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=1*1.5+1*1.5*1.2+1*2*1.2           
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 21; 1ч*1.5+1ч*1.5*1.2+1ч*2*1.2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            Elseif ActiveRequest.Fields("StartTime").Tvalue.Alias="22" OR
+ActiveRequest.Fields("StartTime").Tvalue.Alias="23" OR ActiveRequest.Fields("StartTime").Tvalue.Alias="0" OR ActiveRequest.Fields("StartTime").Tvalue.Alias="1" OR ActiveRequest.Fields("StartTime").Tvalue.Alias="2" OR ActiveRequest.Fields("StartTime").Tvalue.Alias="3" then
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=2*1.5*1.2+1*2*1.2           
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 22-3; 2ч*1.5*1.2+1ч*2*1.2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            Elseif ActiveRequest.Fields("StartTime").Tvalue.Alias="4" then
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=2*1.5*1.2+1*2           
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 4; 2ч*1.5*1.2+1ч*2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            Elseif ActiveRequest.Fields("StartTime").Tvalue.Alias="5" then
+                 ActiveRequest.Fields("OverHoursRate").Tvalue=1*1.5*1.2+1*1.5+1*1*2           
+          ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, 5; 1ч*1.5*1.2+1ч*1.5+1ч*1*2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+            End If
+        Case Else  'Рабочий день, >=4 часов
+            ActiveRequest.Fields("OverHoursRate").Tvalue=ActiveRequest.Fields("Menhour_hour").Tvalue*1.2            
+     ActiveRequest.Fields("Description").Tvalue=Left("Сверхурочные: будний, >4ч; "+CSTR(ActiveRequest.Fields("Menhour_hour").Tvalue)+"ч*1.2="+CSTR(ActiveRequest.Fields("OverHoursRate").Tvalue)+VBCRLF+ActiveRequest.Fields("Description").Tvalue,1023)
+        End Select
+        
+      End If
+    End If
+End If
+    
+ActiveRequest.Save 257
+'UseModifiedRequest
